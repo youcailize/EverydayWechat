@@ -119,54 +119,55 @@ def init_wechat():
     alarm = myset.get('alarm_info')
     alarm_dict = {}
     if alarm.get('is_alarm'):
-        for gi in alarm.get('girlfriend_infos'):
-            ats = gi.get('alarm_timed')
-            if not ats:
-                continue
-            uuid_list = []
-            # start---------------------------处理好友---------------------------start
-            friends = gi.get('wechat_name')
-            if isinstance(friends, str):
-                friends = [friends]
-            if isinstance(friends, list):
-                for name in friends:
-                    if name.lower() in FILEHELPER_MARK:  # 判断是否文件传输助手
-                        uuid_list.append(FILEHELPER)
-                        continue
-                    name_info = get_friend(name)
-                    if not name_info:
-                        print('用户昵称{}无效'.format(name))
-                    else:
-                        uuid_list.append(name_info['UserName'])
-            # end---------------------------处理好友---------------------------end
+        #for gi in alarm.get('girlfriend_infos'):
+        gi = alarm.get('girlfriend_infos')
+        ats = gi.get('alarm_timed')
+        #if not ats:
+        #    continue
+        uuid_list = []
+        # start---------------------------处理好友---------------------------start
+        friends = gi.get('wechat_name')
+        if isinstance(friends, str):
+            friends = [friends]
+        if isinstance(friends, list):
+            for name in friends:
+                if name.lower() in FILEHELPER_MARK:  # 判断是否文件传输助手
+                    uuid_list.append(FILEHELPER)
+                    continue
+                name_info = get_friend(name)
+                if not name_info:
+                    print('用户昵称{}无效'.format(name))
+                else:
+                    uuid_list.append(name_info['UserName'])
+        # end---------------------------处理好友---------------------------end
 
-            # start---------------------------群组处理---------------------------start
-            group_names = gi.get('group_name')
-            if isinstance(group_names, str):
-                group_names = [group_names]
-            if isinstance(group_names, list):
-                for name in group_names:
-                    name_info = get_group(name)
-                    if not name_info:
-                        print('定时任务中的群聊名称『{}』有误。'
-                              '(注意：必须要把需要的群聊保存到通讯录)'.format(name))
-                    else:
-                        uuid_list.append(name_info['UserName'])
-            # end---------------------------群组处理---------------------------end
+        # start---------------------------群组处理---------------------------start
+        group_names = gi.get('group_name')
+        if isinstance(group_names, str):
+            group_names = [group_names]
+        if isinstance(group_names, list):
+            for name in group_names:
+                name_info = get_group(name)
+                if not name_info:
+                    print('定时任务中的群聊名称『{}』有误。'
+                          '(注意：必须要把需要的群聊保存到通讯录)'.format(name))
+                else:
+                    uuid_list.append(name_info['UserName'])
+        # end---------------------------群组处理---------------------------end
 
-            # start---------------------------定时处理---------------------------start
-            if isinstance(ats, str):
-                ats = [ats]
-            if isinstance(ats, list):
-                for at in ats:
-                    times = TIME_COMPILE.findall(at)
-                    if not times:
-                        print('时间{}格式出错'.format(at))
-                        continue
-                    hour, minute = int(times[0][0]), int(times[0][1])
-                    temp_dict = {'hour': hour, 'minute': minute, 'uuid_list': uuid_list}
-                    temp_dict.update(gi)
-                    alarm_dict[md5_encode(str(temp_dict))] = temp_dict
+        # start---------------------------定时处理---------------------------start
+        if isinstance(ats, str):
+            ats = [ats]
+        if isinstance(ats, list):
+            for at in ats:
+                times = TIME_COMPILE.findall(at)
+                if not times:
+                    print('时间{}格式出错'.format(at))
+                    continue
+                hour, minute = int(times[0][0]), int(times[0][1])
+                temp_dict = {'hour': hour, 'minute': minute, 'uuid_list': uuid_list}
+                temp_dict.update(gi)
+                alarm_dict[md5_encode(str(temp_dict))] = temp_dict
         #   end---------------------------定时处理---------------------------end
         alarm['alarm_dict'] = alarm_dict
 
